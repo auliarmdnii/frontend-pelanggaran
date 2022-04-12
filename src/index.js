@@ -12,10 +12,12 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 import '@fortawesome/fontawesome-free/js/all';
 
 import Login from './pages/Login';
+import Pelanggaran from './pages/Pelanggaran';
+import User from './pages/User';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Login />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
