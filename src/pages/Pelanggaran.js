@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Toast } from "bootstrap";
+import { Toast } from 'bootstrap';
 import { Modal } from 'bootstrap';
 
 export default function Pelanggaran() {
   let [pelanggaran, setPelanggaran] = useState([]);
-  let [message, setMessage] = useState("")
-  let [idPelanggaran, setIdPelanggaran] = useState(0)
-  let [namaPelanggaran, setNamaPelanggaran] = useState("")
-  let [poin, setPoin] = useState(0)
-  let [action, setAction] = useState("")
+  let [message, setMessage] = useState('');
 
-  let [modal, setModal] = useState(null)
+  let [idPelanggaran, setIdPelanggaran] = useState(0);
+  let [namaPelanggaran, setNamaPelanggaran] = useState('');
+  let [poin, setPoin] = useState(0);
+  let [action, setAction] = useState('');
+
+  let [modal, setModal] = useState(null);
 
   /** get token from local storage */
   let token = localStorage.getItem(`token-pelanggaran`);
@@ -23,19 +24,16 @@ export default function Pelanggaran() {
   };
 
   /** create function to show Toast */
-  let showToast = message => {
-    let myToast = new Toast(
-      document.getElementById(`myToast`),
-        {
-          autohide: true
-        }
-      )
-      /** perintah utk mengisi state 'message */
-      setMessage(message)
+  let showToast = (message) => {
+    let myToast = new Toast(document.getElementById(`myToast`), {
+      autohide: true,
+    });
+    /** perintah utk mengisi state 'message */
+    setMessage(message);
 
-      /** show Toast */
-      myToast.show()
-  }
+    /** show Toast */
+    myToast.show();
+  };
 
   /** create function to get data pelanggaran from backend */
   let getData = () => {
@@ -56,79 +54,103 @@ export default function Pelanggaran() {
         setPelanggaran(response.data);
 
         /** call showToast */
-        showToast(`Data pelanggaran berhasil dimuat`)
-
+        // showToast(`Data pelanggaran berhasil dimuat`)
       })
       .catch((error) => console.log(error));
   };
 
   let tambahData = () => {
     // display modal
-    modal.show()
+    modal.show();
 
     // mengosongkan inputan form nya
-    setIdPelanggaran(0)
-    setNamaPelanggaran("")
-    setPoin(0)
-    setAction('insert')
-  }
+    setIdPelanggaran(0);
+    setNamaPelanggaran('');
+    setPoin(0);
+    setAction('insert');
+  };
 
-  let editData = item => {
+  let editData = (item) => {
     // display modal
-    modal.show()
+    modal.show();
 
     // isi form sesuai data yg dipilih
-    setIdPelanggaran(item.id_pelanggaran)
-    setNamaPelanggaran(item.nama_pelanggaran)
-    setPoin(item.poin)
-    setAction(`edit`)
-  }
+    setIdPelanggaran(item.id_pelanggaran);
+    setNamaPelanggaran(item.nama_pelanggaran);
+    setPoin(item.poin);
+    setAction(`edit`);
+  };
 
-  let simpanData = event => {
-    event.preventDefault()
+  let simpanData = (event) => {
+    event.preventDefault();
     // close modal
-    modal.hide()
-    if (action === "insert") {
-      let endpoint = `http://localhost:8080/pelanggaran`
+    modal.hide();
+    if (action === 'insert') {
+      let endpoint = `http://localhost:8080/pelanggaran`;
       let request = {
         nama_pelanggaran: namaPelanggaran,
-        poin: poin
-      }
+        poin: poin,
+      };
 
       // send data
-      axios.post(endpoint, request, authorization)
-      .then(response => {
-        showToast(response.data.message)
-        // refresh data pelanggaran
-        getData()
-      })
-      .catch(error => console.log(error))
-    } else if (action === "edit") {
+      axios
+        .post(endpoint, request, authorization)
+        .then((response) => {
+          showToast(response.data.message);
+          // refresh data pelanggaran
+          getData();
+        })
+        .catch((error) => console.log(error));
+    } else if (action === 'edit') {
+      let endpoint = `http://localhost:8080/pelanggaran/${idPelanggaran}`;
+      let request = {
+        nama_pelanggaran: namaPelanggaran,
+        poin: poin,
+      };
 
+      // sending data utk update pelanggaran
+      axios
+        .put(endpoint, request, authorization)
+        .then((response) => {
+          showToast(response.data.message);
+          // refresh data pelanggaran
+          getData();
+        })
+        .catch((error) => console.log(error));
     }
-  }
+  };
+
+  let hapusData = (item) => {
+    if (window.confirm(`Yakin menghapus data ini?`)) {
+      let endpoint = `http://localhost:8080/pelanggaran/${item.id_pelanggaran}`;
+
+      // sending data
+      axios
+        .delete(endpoint, authorization)
+        .then((response) => {
+          showToast(response.data.message);
+          // refresh data
+          getData();
+        })
+        .catch((error) => console.log(error));
+    }
+  };
 
   useEffect(() => {
-    let modal = new Modal(
-      document.getElementById("modalPelanggaran")
-    )
-    setModal(modal)
+    let modal = new Modal(document.getElementById('modalPelanggaran'));
+    setModal(modal);
     getData();
   }, []);
 
   return (
     <div className="container-fluid">
-
       {/* start component Toast */}
-      <div className="position-fixed top-0 end-0 p-3"
-      style={{zIndex: 11}}>
+      <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 11 }}>
         <div className="toast bg-light" id="myToast">
           <div className="toast-header bg-info text-white">
             <strong>Message</strong>
           </div>
-          <div className="toast-body">
-            {message}
-          </div>
+          <div className="toast-body">{message}</div>
         </div>
       </div>
 
@@ -157,15 +179,12 @@ export default function Pelanggaran() {
                     <h5>{item.poin}</h5>
                   </div>
                   <div className="col-2">
-                    <small className="text-info">
-                      Option
-                    </small>
+                    <small className="text-info">Option</small>
                     <br />
-                    <button className="btn btn-sm btn-info mx-1"
-                    onClick={() => editData(item)}>
+                    <button className="btn btn-sm btn-info mx-1" onClick={() => editData(item)}>
                       <span className="fa fa-edit"></span>
                     </button>
-                    <button className="btn btn-sm btn-danger mx-1">
+                    <button className="btn btn-sm btn-danger mx-1" onClick={() => hapusData(item)}>
                       <span className="fa fa-trash"></span>
                     </button>
                   </div>
@@ -175,45 +194,30 @@ export default function Pelanggaran() {
           </ul>
 
           {/* button tambah */}
-          <button className="btn btn-sm btn-success my-2"
-          onClick={() => tambahData()}>
-              <span className="fa fa-plus"></span> Tambah Data
+          <button className="btn btn-sm btn-success my-2" onClick={() => tambahData()}>
+            <span className="fa fa-plus"></span> Tambah Data
           </button>
 
           {/* buat modal yg isinya form utk data pelanggaran */}
           <div className="modal" id="modalPelanggaran">
-              <div className="modal-dialog modal-md">
-                <div className="modal-content">
-                  <div className="modal-header bg-dark">
-                    <h4 className="text-white">
-                      Form Pelanggaran
-                    </h4>
-                  </div>
-                  <div className="modal-body">
-                    <form onSubmit={ev => simpanData(ev)}>
-                      Jenis Pelanggaran
-                      <input
-                        type="text"
-                        className="form-control mb-2"
-                        required
-                        onChange={e => setNamaPelanggaran(e.target.value)}
-                        value={namaPelanggaran}/>
-
-                      Poin
-                      <input
-                      type="number"
-                      className="form-control mb-2"
-                      required
-                      onChange={e => setPoin(e.target.value)}
-                        value={poin}/>
-
-                      <button className="btn btn-success">
-                        <span className="fa fa-check"></span> Simpan
-                      </button>
-                    </form>
-                  </div>
+            <div className="modal-dialog modal-md">
+              <div className="modal-content">
+                <div className="modal-header bg-dark">
+                  <h4 className="text-white">Form Pelanggaran</h4>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={(ev) => simpanData(ev)}>
+                    Jenis Pelanggaran
+                    <input type="text" className="form-control mb-2" required onChange={(e) => setNamaPelanggaran(e.target.value)} value={namaPelanggaran} />
+                    Poin
+                    <input type="number" className="form-control mb-2" required onChange={(e) => setPoin(e.target.value)} value={poin} />
+                    <button className="btn btn-success">
+                      <span className="fa fa-check"></span> Simpan
+                    </button>
+                  </form>
                 </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
