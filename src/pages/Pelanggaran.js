@@ -194,7 +194,7 @@ export default function Pelanggaran() {
           </ul>
 
           {/* button tambah */}
-          <button className="btn btn-sm btn-success my-2" onClick={() => tambahData()}>
+          <button className="btn btn-sm btn-dark my-2" onClick={() => tambahData()}>
             <span className="fa fa-plus"></span> Tambah Data
           </button>
 
